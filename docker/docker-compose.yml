@@ -4,11 +4,11 @@ services:
 
   elasticsearch:
     build:
-      context: elasticsearch/
+      context: ./$PATH_OMS_DOGWATCH/elasticsearch/
       args:
         ELK_VERSION: $ELK_VERSION
     volumes:
-      - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+      - ./$PATH_OMS_GLOBAL/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -19,12 +19,12 @@ services:
 
   logstash:
     build:
-      context: logstash/
+      context: ./$PATH_OMS_DOGWATCH/logstash/
       args:
         ELK_VERSION: $ELK_VERSION
     volumes:
-      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
-      - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
+      - ./$PATH_OMS_DOGWATCH/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+      - ./$PATH_OMS_DOGWATCH/logstash/pipeline:/usr/share/logstash/pipeline:ro
     ports:
       - "5000:5000"
       - "9600:9600"
@@ -37,11 +37,11 @@ services:
 
   kibana:
     build:
-      context: kibana/
+      context: ./$PATH_OMS_DOGWATCH/kibana/
       args:
         ELK_VERSION: $ELK_VERSION
     volumes:
-      - ./kibana/config/:/usr/share/kibana/config:ro
+      - ./$PATH_OMS_DOGWATCH/kibana/config/:/usr/share/kibana/config:ro
     ports:
       - "5601:5601"
     networks:
@@ -53,7 +53,7 @@ services:
     image: ingensi/dockbeat:latest #they have no fixed tags
     volumes:
         - /var/run/docker.sock:/var/run/docker.sock:ro
-        - /opt/docker-elk/dockbeat/:/etc/dockbeat
+        - ./$PATH_OMS_DOGWATCH/dockbeat/:/etc/dockbeat
     networks:
       - elk
     depends_on:
@@ -61,7 +61,7 @@ services:
 
   logspout:
     build:
-      context: logspout/
+      context: ./$PATH_OMS_DOGWATCH/logspout/
     volumes:
         - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
