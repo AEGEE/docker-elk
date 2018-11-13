@@ -1,0 +1,106 @@
+################### Dockbeat Configuration Example #########################
+#can be found at https://github.com/Ingensi/dockbeat/blob/develop/dockbeat.yml
+############################# Dockbeat ######################################
+
+dockbeat:
+  # Defines how often a docker stat is sent to the output
+  period: ${PERIOD:5}
+
+  # Defines the docker socket path
+  # By default, this will get the unix:///var/run/docker.sock
+  socket: ${DOCKER_SOCKET:unix:///var/run/docker.sock}
+
+  # Enable or disable stats shipping
+  stats:
+    container: true
+    net: true
+    memory: true
+    blkio: true
+    cpu: true
+###############################################################################
+############################# Libbeat Config ##################################
+# Base config file used by all other beats for using libbeat features
+
+############################# Output ##########################################
+
+# Configure what outputs to use when sending the data collected by the beat.
+# Multiple outputs may be used.
+output:
+
+  ### Logstash as output
+  logstash:
+    # The Logstash hosts
+    hosts: ["logstash:5044"] 
+
+    # Number of workers per Logstash host.
+    #worker: 1
+
+    # Set gzip compression level.
+    #compression_level: 3
+
+    # Optional load balance the events between the Logstash hosts
+    #loadbalance: true
+
+    # Optional index name. The default index name is set to name of the beat
+    # in all lowercase.
+    index: dockbeat
+
+  ### File as output
+  #file:
+    # Path to the directory where to save the generated files. The option is mandatory.
+    #path: "/tmp/dockbeat"
+
+    # Name of the generated files. The default is `dockbeat` and it generates files: `dockbeat`, `dockbeat.1`, `dockbeat.2`, etc.
+    #filename: dockbeat
+
+    # Maximum size in kilobytes of each file. When this size is reached, the files are
+    # rotated. The default value is 10240 kB.
+    #rotate_every_kb: 10000
+
+    # Maximum number of files under path. When this number of files is reached, the
+    # oldest file is deleted and the rest are shifted from last to first. The default
+    # is 7 files.
+    #number_of_files: 7
+
+
+  ### Console output
+  # console:
+    # Pretty print json event
+    #pretty: false
+
+
+############################# Shipper #########################################
+
+shipper:
+  # The name of the shipper that publishes the network data. It can be used to group
+  # all the transactions sent by a single shipper in the web interface.
+  # If this options is not defined, the hostname is used.
+  #name:
+
+  # The tags of the shipper are included in their own field with each
+  # transaction published. Tags make it easy to group servers by different
+  # logical properties.
+  #tags: ["service-X", "web-tier"]
+  tags: ["host:testing"]
+
+  # Optional fields that you can specify to add additional information to the
+  # output. Fields can be scalar values, arrays, dictionaries, or any nested
+  # combination of these.
+  #fields:
+  #  env: staging
+
+
+############################# Logging #########################################
+
+# There are three options for the log output: syslog, file, stderr.
+# Under Windows systems, the log files are per default sent to the file output,
+# under all other system per default to syslog.
+logging:
+
+  # Send all logging output to syslog. On Windows default is false, otherwise
+  # default is true.
+  to_syslog: true 
+
+  # Sets log level. The default log level is error.
+  # Available log levels are: critical, error, warning, info, debug
+  level: warning 
