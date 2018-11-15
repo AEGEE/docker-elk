@@ -1,4 +1,4 @@
-version: '2'
+version: '3.2'
 
 services:
 
@@ -6,22 +6,22 @@ services:
     build:
       context: ./$PATH_OMS_DOGWATCH/elasticsearch/
       args:
-        ELK_VERSION: $ELK_VERSION
+        ELK_VERSION: 6.4.2
     volumes:
-      - ./$PATH_OMS_GLOBAL/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+      - ./$PATH_OMS_DOGWATCH/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
     ports:
       - "9200:9200"
       - "9300:9300"
     environment:
       ES_JAVA_OPTS: "-Xmx256m -Xms256m"
-    networks:
-      - elk
+#    networks:
+#      - elk
 
   logstash:
     build:
       context: ./$PATH_OMS_DOGWATCH/logstash/
       args:
-        ELK_VERSION: $ELK_VERSION
+        ELK_VERSION: 6.4.2
     volumes:
       - ./$PATH_OMS_DOGWATCH/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
       - ./$PATH_OMS_DOGWATCH/logstash/pipeline:/usr/share/logstash/pipeline:ro
@@ -30,8 +30,8 @@ services:
       - "9600:9600"
     environment:
       LS_JAVA_OPTS: "-Xmx256m -Xms256m"
-    networks:
-      - elk
+#    networks:
+#      - elk
     depends_on:
       - elasticsearch
 
@@ -39,19 +39,20 @@ services:
     build:
       context: ./$PATH_OMS_DOGWATCH/kibana/
       args:
-        ELK_VERSION: $ELK_VERSION
+        ELK_VERSION: 6.4.2
     volumes:
       - ./$PATH_OMS_DOGWATCH/kibana/config/:/usr/share/kibana/config:ro
-    ports:
-      - "5601:5601"
-    networks:
-      - elk
+    expose:
+      - 5601
+#    networks:
+#      - elk
     depends_on:
       - elasticsearch
     labels:
       - traefik.enable=true
       - traefik.backend=kibana
       - traefik.frontend.rule=HostRegexp:{domain:kibana.[a-z0-9.]+}
+      - traefik.ports=5601
       - traefik.frontend.priority=20
       - traefik.frontend.auth.basic=admin:$$2y$$05$$nO3b1XapOtAORGcLAwMmyenyrVU4xWuEk08nEwvmFRcABz1NSv4Xq
 
@@ -60,8 +61,8 @@ services:
     volumes:
         - /var/run/docker.sock:/var/run/docker.sock:ro
         - ./$PATH_OMS_DOGWATCH/dockbeat/:/etc/dockbeat
-    networks:
-      - elk
+    #    networks:
+    #      - elk
     depends_on:
       - logstash 
 
@@ -72,9 +73,9 @@ services:
         - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
         ROUTE_URIS: "logstash://logstash:5000"
-    networks:
-      - elk
-        #    - OMS
+    #    networks:
+    #      - elk
+        # - OMS
     depends_on:
       - logstash 
 
@@ -82,5 +83,5 @@ networks:
   default:
     external:
       name: OMS
-  elk:
-    driver: bridge
+#  elk:
+#    driver: bridge
