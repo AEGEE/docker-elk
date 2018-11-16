@@ -4,7 +4,7 @@
 
 dockbeat:
   # Defines how often a docker stat is sent to the output
-  period: ${PERIOD:5}
+  period: ${PERIOD:25}
 
   # Defines the docker socket path
   # By default, this will get the unix:///var/run/docker.sock
@@ -81,7 +81,7 @@ shipper:
   # transaction published. Tags make it easy to group servers by different
   # logical properties.
   #tags: ["service-X", "web-tier"]
-  tags: ["host:testing"]
+    tags: ["host:testing", "beat:dock"]
 
   # Optional fields that you can specify to add additional information to the
   # output. Fields can be scalar values, arrays, dictionaries, or any nested

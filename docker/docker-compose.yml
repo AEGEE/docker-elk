@@ -27,6 +27,7 @@ services:
       - ./$PATH_OMS_DOGWATCH/logstash/pipeline:/usr/share/logstash/pipeline:ro
     ports:
       - "5000:5000"
+        #- "5044:5044"
       - "9600:9600"
     environment:
       LS_JAVA_OPTS: "-Xmx256m -Xms256m"
@@ -42,8 +43,8 @@ services:
         ELK_VERSION: 6.4.2
     volumes:
       - ./$PATH_OMS_DOGWATCH/kibana/config/:/usr/share/kibana/config:ro
-    expose:
-      - 5601
+    ports:
+      - 5601:5601
 #    networks:
 #      - elk
     depends_on:
@@ -56,13 +57,37 @@ services:
       - traefik.frontend.priority=20
       - traefik.frontend.auth.basic=admin:$$2y$$05$$nO3b1XapOtAORGcLAwMmyenyrVU4xWuEk08nEwvmFRcABz1NSv4Xq
 
-  dockbeat:
-    image: ingensi/dockbeat:latest #they have no fixed tags
+#  dockbeat:
+#    image: ingensi/dockbeat:latest #they have no fixed tags
+#    volumes:
+#        - /var/run/docker.sock:/var/run/docker.sock:ro
+#        - ./$PATH_OMS_DOGWATCH/dockbeat/:/etc/dockbeat
+#    #    networks:
+#    #      - elk
+#    depends_on:
+#      - logstash 
+
+  metricbeat:
+    #image: docker.elastic.co/beats/metricbeat:6.5.0
+    build:
+      context: ./$PATH_OMS_DOGWATCH/metricbeat/
     volumes:
         - /var/run/docker.sock:/var/run/docker.sock:ro
-        - ./$PATH_OMS_DOGWATCH/dockbeat/:/etc/dockbeat
+        - /proc/:/hostfs/proc:ro
+        - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
+        - /:/hostfs/:ro
+        - ./$PATH_OMS_DOGWATCH/metricbeat/metricbeat.yml:/usr/share/metricbeat/metricbeat.yml #do NOT override whole directory as the executable is there
     #    networks:
     #      - elk
+    environment:
+        - "WAIT_FOR_HOSTS=elasticsearch:9200 kibana:5601"
+        - "HOST_ELASTICSEARCH=elasticsearch:9200"
+    command: -system.hostfs=/hostfs -e
+    network_mode: host
+    extra_hosts:
+        - "elasticsearch:172.17.0.1" # The IP of docker0 interface to access host from container
+        - "logstash:172.17.0.1" # The IP of docker0 interface to access host from container
+        - "kibana:172.17.0.1" # The IP of docker0 interface to access host from container
     depends_on:
       - logstash 
 
