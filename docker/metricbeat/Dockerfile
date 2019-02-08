@@ -7,6 +7,8 @@ RUN yum -y install nc
 RUN mkdir /var/log/metricbeat \
     && chown metricbeat /var/log/metricbeat
 
+COPY metricbeat.yml /usr/share/metricbeat/metricbeat.yml
+RUN chmod go-w /usr/share/metricbeat/metricbeat.yml
 COPY entrypoint.sh /usr/local/bin/custom-entrypoint
 RUN chmod +x /usr/local/bin/custom-entrypoint
 

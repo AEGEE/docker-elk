@@ -26,7 +26,7 @@ output:
     elasticsearch: 
         hosts: ["elasticsearch:9200"]
 #    logstash: 
-#        hosts: ["logstash:5000"]
+#        hosts: ["logstash:5044"]
 
 setup:
     kibana:

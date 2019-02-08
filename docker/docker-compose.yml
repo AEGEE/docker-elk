@@ -9,9 +9,10 @@ services:
         ELK_VERSION: 6.4.2
     volumes:
       - ./$PATH_OMS_DOGWATCH/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+      - elastic-data:/usr/share/elasticsearch/data
     ports:
-      - "9200:9200"
-      - "9300:9300"
+      - 9200:9200
+      - 9300:9300
     environment:
       ES_JAVA_OPTS: "-Xmx256m -Xms256m"
 #    networks:
@@ -26,9 +27,8 @@ services:
       - ./$PATH_OMS_DOGWATCH/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
       - ./$PATH_OMS_DOGWATCH/logstash/pipeline:/usr/share/logstash/pipeline:ro
     ports:
-      - "5000:5000"
-        #- "5044:5044"
-      - "9600:9600"
+      - 5000:5000
+      - 5044:5044
     environment:
       LS_JAVA_OPTS: "-Xmx256m -Xms256m"
 #    networks:
@@ -44,7 +44,7 @@ services:
     volumes:
       - ./$PATH_OMS_DOGWATCH/kibana/config/:/usr/share/kibana/config:ro
     ports:
-      - 5601:5601
+        - 5601:5601
 #    networks:
 #      - elk
     depends_on:
@@ -68,7 +68,7 @@ services:
 #      - logstash 
 
   metricbeat:
-    #image: docker.elastic.co/beats/metricbeat:6.5.0
+    #image: docker.elastic.co/beats/metricbeat:6.4.2
     build:
       context: ./$PATH_OMS_DOGWATCH/metricbeat/
     volumes:
@@ -76,11 +76,9 @@ services:
         - /proc/:/hostfs/proc:ro
         - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
         - /:/hostfs/:ro
-        - ./$PATH_OMS_DOGWATCH/metricbeat/metricbeat.yml:/usr/share/metricbeat/metricbeat.yml #do NOT override whole directory as the executable is there
-    #    networks:
-    #      - elk
+          #- ./$PATH_OMS_DOGWATCH/metricbeat/metricbeat.yml:/usr/share/metricbeat/metricbeat.yml # only for dev. do NOT override whole directory as the executable is there
     environment:
-        - "WAIT_FOR_HOSTS=elasticsearch:9200 kibana:5601"
+        - "WAIT_FOR_HOSTS=elasticsearch:9200 kibana:5601" # logstash:5044"
         - "HOST_ELASTICSEARCH=elasticsearch:9200"
     command: -system.hostfs=/hostfs -e
     network_mode: host
@@ -88,10 +86,10 @@ services:
         - "elasticsearch:172.17.0.1" # The IP of docker0 interface to access host from container
         - "logstash:172.17.0.1" # The IP of docker0 interface to access host from container
         - "kibana:172.17.0.1" # The IP of docker0 interface to access host from container
-    #    networks:
-    #      - elk
+#    networks:
+#        - elk
     depends_on:
-      - logstash 
+        - logstash 
 
   logspout:
     build:
@@ -100,11 +98,17 @@ services:
         - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
         ROUTE_URIS: "logstash://logstash:5000"
-    #    networks:
-    #      - elk
-        # - OMS
+#    networks:
+#      - elk
+      # - OMS
     depends_on:
       - logstash 
+    restart: on-failure
+
+volumes:
+  elastic-data:
+    driver: local
+
 
 networks:
   default:
