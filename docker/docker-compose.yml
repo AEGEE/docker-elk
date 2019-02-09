@@ -29,6 +29,7 @@ services:
     ports:
       - 5000:5000
       - 5044:5044
+      - 9600:9600
     environment:
       LS_JAVA_OPTS: "-Xmx256m -Xms256m"
 #    networks:
@@ -76,7 +77,7 @@ services:
         - /proc/:/hostfs/proc:ro
         - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
         - /:/hostfs/:ro
-          #- ./$PATH_OMS_DOGWATCH/metricbeat/metricbeat.yml:/usr/share/metricbeat/metricbeat.yml # only for dev. do NOT override whole directory as the executable is there
+    #- ./$PATH_OMS_DOGWATCH/metricbeat/metricbeat.yml:/usr/share/metricbeat/metricbeat.yml:ro # only for dev. do NOT override whole directory as the executable is there
     environment:
         - "WAIT_FOR_HOSTS=elasticsearch:9200 kibana:5601" # logstash:5044"
         - "HOST_ELASTICSEARCH=elasticsearch:9200"
@@ -88,6 +89,21 @@ services:
         - "kibana:172.17.0.1" # The IP of docker0 interface to access host from container
 #    networks:
 #        - elk
+    depends_on:
+        - logstash 
+
+  filebeat:
+    #image: docker.elastic.co/beats/metricbeat:6.4.2
+    build:
+      context: ./$PATH_OMS_DOGWATCH/filebeat/
+    volumes:
+        - /opt/backups:/opt/backups:ro #MAKE A VOLUME SHARED AMONG CONTAINERS
+          #- shared_logs:/var/log/traefik/ #not this way :/
+        - ./$PATH_OMS_GLOBAL/traefik/logs:/var/log/traefik #not this way :/
+        - ./$PATH_OMS_DOGWATCH/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro # only for dev. do NOT override whole directory as the executable is there
+    environment:
+        - "WAIT_FOR_HOSTS=elasticsearch:9200 kibana:5601" 
+        - "HOST_ELASTICSEARCH=elasticsearch:9200"
     depends_on:
         - logstash 
 
@@ -108,7 +124,9 @@ services:
 volumes:
   elastic-data:
     driver: local
-
+#  shared_logs:
+#    external: 
+#        name: shared_logs
 
 networks:
   default:

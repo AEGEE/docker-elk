@@ -1,0 +1,46 @@
+filebeat.inputs:
+- type: log
+  enabled: true
+  tags: [ "backup_log", "beat" ]
+  fields: 
+      x_file_type: "backup"
+  paths:
+      - /opt/backups/*.log
+- type: log
+  enabled: true
+  tags: [ "traefik_log", "beat" ]
+  fields: 
+      x_file_type: "traefik-access"
+  paths:
+      - /var/log/traefik/*.log
+
+
+#filebeat.modules:
+#- module: traefik 
+#  enabled: true
+#  access: 
+#    var.paths: ["/var/log/traefik/*.log"]
+#
+#tags: ["host:testing", "beat2:file2", "traefik_log", "beat"]
+
+fields:
+   x_beat: "file"
+   x_fuck: "traefik_module_field"
+
+name: "filebeat-shipper"
+  
+output:
+    logstash: 
+        hosts: ["logstash:5044"]
+        escape_html: true
+
+setup:
+    kibana:
+        host: "kibana:5601"
+    dashboards:
+        enabled: true
+    template:
+        name: "filepeat-%{[beat.version]}"
+        pattern: "filepeat-%{[beat.version]}-*"
+#logging.to_syslog: true 
+#logging.to_files: false

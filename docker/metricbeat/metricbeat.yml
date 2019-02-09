@@ -19,8 +19,8 @@ metricbeat.modules:
 shipper:
     tags: ["host:testing", "beat:metric"]
 
-#    fields:
-#       env: staging
+    fields:
+       beat: metric
   
 output:
     elasticsearch: 
