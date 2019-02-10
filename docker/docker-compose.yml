@@ -101,6 +101,22 @@ services:
           #- shared_logs:/var/log/traefik/ #not this way :/
         - ./$PATH_OMS_GLOBAL/traefik/logs:/var/log/traefik #not this way :/
         - ./$PATH_OMS_DOGWATCH/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro # only for dev. do NOT override whole directory as the executable is there
+          #- ./$PATH_OMS_DOGWATCH/filebeat/jesus.yml:/usr/share/filebeat/jesus.yml #just to bring stuff from the container to the host
+          #- ./$PATH_OMS_DOGWATCH/filebeat/fields.yml:/usr/share/filebeat/fields.yml
+    environment:
+        - "WAIT_FOR_HOSTS=elasticsearch:9200 kibana:5601" 
+        - "HOST_ELASTICSEARCH=elasticsearch:9200"
+    depends_on:
+        - logstash 
+
+  filebeat-auth:
+    #image: docker.elastic.co/beats/metricbeat:6.4.2
+    build:
+      context: ./$PATH_OMS_DOGWATCH/filebeat/
+      dockerfile: ./Dockerfile-auth
+    volumes:
+        - /var/log/auth.log:/var/log/auth/auth.log:ro 
+          #- ./$PATH_OMS_DOGWATCH/filebeat/filebeat-auth.yml:/usr/share/filebeat/filebeat.yml:ro # only for dev. do NOT override whole directory as the executable is there
     environment:
         - "WAIT_FOR_HOSTS=elasticsearch:9200 kibana:5601" 
         - "HOST_ELASTICSEARCH=elasticsearch:9200"

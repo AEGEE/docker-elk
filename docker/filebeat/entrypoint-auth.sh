@@ -24,15 +24,16 @@ wait_all_hosts() {
 
 wait_all_hosts
 
-while ! curl -s -X GET ${HOST_ELASTICSEARCH}/_cluster/health\?wait_for_status\=yellow\&timeout\=60s | grep -q '"status":"yellow"'
-do
-    echo "==> Waiting for cluster (${HOST_ELASTICSEARCH}) YELLOW status" && sleep 3
-done
+#while ! curl -s -X GET ${HOST_ELASTICSEARCH}/_cluster/health\?wait_for_status\=yellow\&timeout\=60s | grep -q '"status":"yellow"'
+#do
+#    echo "==> Waiting for cluster (${HOST_ELASTICSEARCH}) YELLOW status" && sleep 3
+#done
 
-echo ""
-echo "Cluster is YELLOW. Fine ! (But you could maybe try to have it GREEN ;))"
-echo ""
+#echo ""
+#echo "Cluster is YELLOW. Fine ! (But you could maybe try to have it GREEN ;))"
+#echo ""
 
-
-bash -c "/usr/local/bin/docker-entrypoint modules enable docker"
-bash -c "/usr/local/bin/docker-entrypoint $*"
+bash -c "/usr/local/bin/docker-entrypoint modules enable system -e"
+bash -c "/usr/local/bin/docker-entrypoint setup -e"
+#bash -c "/usr/local/bin/docker-entrypoint -e"
+bash -c "/usr/local/bin/docker-entrypoint run -e"

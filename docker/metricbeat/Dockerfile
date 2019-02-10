@@ -5,7 +5,8 @@ USER root
 RUN yum -y install nc
 
 RUN mkdir /var/log/metricbeat \
-    && chown metricbeat /var/log/metricbeat
+    && chown metricbeat /var/log/metricbeat \
+    && usermod -a -G input metricbeat
 
 COPY metricbeat.yml /usr/share/metricbeat/metricbeat.yml
 RUN chmod go-w /usr/share/metricbeat/metricbeat.yml

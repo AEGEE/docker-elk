@@ -1,0 +1,25 @@
+filebeat.modules:
+- module: system
+  auth:
+      var.paths: ["/var/log/auth/*.log"]  
+    
+tags: [ "auth_log", "beat" ]
+
+name: "filebeat-ssh-shipper"
+  
+output:
+    elasticsearch: 
+        hosts: ["elasticsearch:9200"]
+        escape_html: true
+
+setup:
+    kibana:
+        host: "kibana:5601"
+    dashboards:
+        enabled: true
+#    template:
+#        name: "filebeat-%{[beat.version]}"
+#        pattern: "filebeat-*"
+        #fields: "/usr/share/filebeat/fields.yml"
+#logging.to_syslog: true 
+#logging.to_files: false

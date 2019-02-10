@@ -7,10 +7,13 @@ RUN mkdir /var/log/filebeat \
 
 RUN yum -y install nc
 
-COPY filebeat.yml /usr/share/filebeat/filebeat.yml
+#RUN groupadd -g 4 adm \
+RUN usermod -a -G adm filebeat
+
+COPY filebeat-auth.yml /usr/share/filebeat/filebeat.yml
 RUN chmod go-w /usr/share/filebeat/filebeat.yml
 
-COPY entrypoint.sh /usr/local/bin/custom-entrypoint
+COPY entrypoint-auth.sh /usr/local/bin/custom-entrypoint
 RUN chmod +x /usr/local/bin/custom-entrypoint
 
 USER filebeat

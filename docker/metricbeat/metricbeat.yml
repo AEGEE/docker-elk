@@ -28,6 +28,8 @@ output:
 #    logstash: 
 #        hosts: ["logstash:5044"]
 
+metricbeat.config.modules.path: "/usr/share/metricbeat/modules.d/*.yml"
+
 setup:
     kibana:
         host: "kibana:5601"
