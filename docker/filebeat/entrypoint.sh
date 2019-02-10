@@ -33,6 +33,6 @@ wait_all_hosts
 #echo "Cluster is YELLOW. Fine ! (But you could maybe try to have it GREEN ;))"
 #echo ""
 
-
-bash -c "/usr/local/bin/docker-entrypoint -e"
-#bash -c "/usr/local/bin/docker-entrypoint run"
+bash -c "/usr/local/bin/docker-entrypoint setup --template -E output.logstash.enabled=false -E 'output.elasticsearch.hosts=[\"elasticsearch:9200\"]'"
+#bash -c "/usr/local/bin/docker-entrypoint -e"
+bash -c "/usr/local/bin/docker-entrypoint run -e"

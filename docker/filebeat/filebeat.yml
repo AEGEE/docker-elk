@@ -6,28 +6,28 @@ filebeat.inputs:
       x_file_type: "backup"
   paths:
       - /opt/backups/*.log
-- type: log
-  enabled: true
-  tags: [ "traefik_log", "beat" ]
-  fields: 
-      x_file_type: "traefik-access"
-  paths:
-      - /var/log/traefik/*.log
-
-
-#filebeat.modules:
-#- module: traefik 
+#- type: log
 #  enabled: true
-#  access: 
-#    var.paths: ["/var/log/traefik/*.log"]
-#
-#tags: ["host:testing", "beat2:file2", "traefik_log", "beat"]
+#  tags: [ "traefik_log", "beat" ]
+#  fields: 
+#      x_file_type: "traefik-access"
+#  paths:
+#      - /var/log/traefik/*.log
+
+
+filebeat.modules:
+- module: traefik 
+  enabled: true
+  access: 
+    var.paths: ["/var/log/traefik/*.log"]
+
+tags: [ "traefik_log", "beat"]
 
 fields:
    x_beat: "file"
    x_fuck: "traefik_module_field"
 
-name: "filebeat-shipper"
+name: "filebeat-traefik_and_backup-shipper"
   
 output:
     logstash: 
@@ -40,7 +40,9 @@ setup:
     dashboards:
         enabled: true
     template:
-        name: "filepeat-%{[beat.version]}"
-        pattern: "filepeat-%{[beat.version]}-*"
+        overwrite: true
+        name: "filebeat-%{[beat.version]}"
+        pattern: "filebeat-*"
+        #fields: "/usr/share/filebeat/fields.yml"
 #logging.to_syslog: true 
 #logging.to_files: false
