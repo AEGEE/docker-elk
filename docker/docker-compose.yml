@@ -4,11 +4,11 @@ services:
 
   elasticsearch:
     build:
-      context: ./$PATH_OMS_DOGWATCH/elasticsearch/
+      context: ./$PATH_OMS_ELASTIC/elasticsearch/
       args:
         ELK_VERSION: 6.4.2
     volumes:
-      - ./$PATH_OMS_DOGWATCH/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+      - ./$PATH_OMS_ELASTIC/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
       - elastic-data:/usr/share/elasticsearch/data
     ports:
       - 9200:9200
@@ -20,12 +20,12 @@ services:
 
   logstash:
     build:
-      context: ./$PATH_OMS_DOGWATCH/logstash/
+      context: ./$PATH_OMS_ELASTIC/logstash/
       args:
         ELK_VERSION: 6.4.2
     volumes:
-      - ./$PATH_OMS_DOGWATCH/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
-      - ./$PATH_OMS_DOGWATCH/logstash/pipeline:/usr/share/logstash/pipeline:ro
+      - ./$PATH_OMS_ELASTIC/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+      - ./$PATH_OMS_ELASTIC/logstash/pipeline:/usr/share/logstash/pipeline:ro
     ports:
       - 5000:5000
       - 5044:5044
@@ -39,11 +39,11 @@ services:
 
   kibana:
     build:
-      context: ./$PATH_OMS_DOGWATCH/kibana/
+      context: ./$PATH_OMS_ELASTIC/kibana/
       args:
         ELK_VERSION: 6.4.2
     volumes:
-      - ./$PATH_OMS_DOGWATCH/kibana/config/:/usr/share/kibana/config:ro
+      - ./$PATH_OMS_ELASTIC/kibana/config/:/usr/share/kibana/config:ro
     ports:
         - 5601:5601
 #    networks:
@@ -62,7 +62,7 @@ services:
 #    image: ingensi/dockbeat:latest #they have no fixed tags
 #    volumes:
 #        - /var/run/docker.sock:/var/run/docker.sock:ro
-#        - ./$PATH_OMS_DOGWATCH/dockbeat/:/etc/dockbeat
+#        - ./$PATH_OMS_ELASTIC/dockbeat/:/etc/dockbeat
 #    #    networks:
 #    #      - elk
 #    depends_on:
@@ -71,13 +71,13 @@ services:
   metricbeat:
     #image: docker.elastic.co/beats/metricbeat:6.4.2
     build:
-      context: ./$PATH_OMS_DOGWATCH/metricbeat/
+      context: ./$PATH_OMS_ELASTIC/metricbeat/
     volumes:
         - /var/run/docker.sock:/var/run/docker.sock:ro
         - /proc/:/hostfs/proc:ro
         - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
         - /:/hostfs/:ro
-    #- ./$PATH_OMS_DOGWATCH/metricbeat/metricbeat.yml:/usr/share/metricbeat/metricbeat.yml:ro # only for dev. do NOT override whole directory as the executable is there
+    #- ./$PATH_OMS_ELASTIC/metricbeat/metricbeat.yml:/usr/share/metricbeat/metricbeat.yml:ro # only for dev. do NOT override whole directory as the executable is there
     environment:
         - "WAIT_FOR_HOSTS=elasticsearch:9200 kibana:5601" # logstash:5044"
         - "HOST_ELASTICSEARCH=elasticsearch:9200"
@@ -95,14 +95,14 @@ services:
   filebeat:
     #image: docker.elastic.co/beats/metricbeat:6.4.2
     build:
-      context: ./$PATH_OMS_DOGWATCH/filebeat/
+      context: ./$PATH_OMS_ELASTIC/filebeat/
     volumes:
         - /opt/backups:/opt/backups:ro #MAKE A VOLUME SHARED AMONG CONTAINERS
           #- shared_logs:/var/log/traefik/ #not this way :/
         - ./$PATH_OMS_GLOBAL/traefik/logs:/var/log/traefik #not this way :/
-        - ./$PATH_OMS_DOGWATCH/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro # only for dev. do NOT override whole directory as the executable is there
-          #- ./$PATH_OMS_DOGWATCH/filebeat/jesus.yml:/usr/share/filebeat/jesus.yml #just to bring stuff from the container to the host
-          #- ./$PATH_OMS_DOGWATCH/filebeat/fields.yml:/usr/share/filebeat/fields.yml
+        - ./$PATH_OMS_ELASTIC/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro # only for dev. do NOT override whole directory as the executable is there
+          #- ./$PATH_OMS_ELASTIC/filebeat/jesus.yml:/usr/share/filebeat/jesus.yml #just to bring stuff from the container to the host
+          #- ./$PATH_OMS_ELASTIC/filebeat/fields.yml:/usr/share/filebeat/fields.yml
     environment:
         - "WAIT_FOR_HOSTS=elasticsearch:9200 kibana:5601" 
         - "HOST_ELASTICSEARCH=elasticsearch:9200"
@@ -112,11 +112,11 @@ services:
   filebeat-auth:
     #image: docker.elastic.co/beats/metricbeat:6.4.2
     build:
-      context: ./$PATH_OMS_DOGWATCH/filebeat/
+      context: ./$PATH_OMS_ELASTIC/filebeat/
       dockerfile: ./Dockerfile-auth
     volumes:
         - /var/log/auth.log:/var/log/auth/auth.log:ro 
-          #- ./$PATH_OMS_DOGWATCH/filebeat/filebeat-auth.yml:/usr/share/filebeat/filebeat.yml:ro # only for dev. do NOT override whole directory as the executable is there
+          #- ./$PATH_OMS_ELASTIC/filebeat/filebeat-auth.yml:/usr/share/filebeat/filebeat.yml:ro # only for dev. do NOT override whole directory as the executable is there
     environment:
         - "WAIT_FOR_HOSTS=elasticsearch:9200 kibana:5601" 
         - "HOST_ELASTICSEARCH=elasticsearch:9200"
@@ -125,7 +125,7 @@ services:
 
   logspout:
     build:
-      context: ./$PATH_OMS_DOGWATCH/logspout/
+      context: ./$PATH_OMS_ELASTIC/logspout/
     volumes:
         - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
