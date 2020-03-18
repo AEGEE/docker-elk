@@ -53,7 +53,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.backend=kibana
-      - traefik.frontend.rule=HostRegexp:{domain:kibana.[a-z0-9.]+}
+      - traefik.frontend.rule=Host:${SUBDOMAIN_KIBANA}${BASE_URL}
       - traefik.ports=5601
       - traefik.frontend.priority=20
       - traefik.frontend.auth.basic=admin:$$2y$$05$$nO3b1XapOtAORGcLAwMmyenyrVU4xWuEk08nEwvmFRcABz1NSv4Xq
